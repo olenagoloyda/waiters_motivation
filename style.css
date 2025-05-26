@@ -1,0 +1,137 @@
+/* ===== БАЗА ===== */
+body {
+  background-color: #d0ccc0d3;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #3e3d46;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ===== ФОНОВИЙ ГОРОБЕЦЬ ===== */
+
+
+/* ===== КОНТЕЙНЕР ===== */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 30px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== ЗАГОЛОВОК ===== */
+h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle,
+.updated-text {
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #3e3d46;
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* ===== ОСНОВНА ТАБЛИЦЯ ===== */
+#ratingTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 60px;
+  background-color: #f7f6e1;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+#ratingTable th,
+#ratingTable td {
+  padding: 16px 14px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid hsl(48, 69%, 74%);
+}
+
+#ratingTable th {
+  background-color: #ffe357;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #3e3d46;
+}
+
+#ratingTable td:first-child a {
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #3e3d46;
+}
+
+/* ===== КАТЕГОРІЇ ===== */
+.category-block {
+  margin-bottom: 60px;
+}
+
+.category-block h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #3e3d46;
+  border-left: 4px solid #f7650a;
+  padding-left: 10px;
+}
+
+/* ===== КАТЕГОРІЙНА ТАБЛИЦЯ ===== */
+.category-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.category-table th,
+.category-table td {
+  padding: 14px 12px;
+  text-align: center;
+  border-bottom: 1px solid #f1e3ba;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.category-table th {
+  background-color: #f8f13b;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #0e0d0c;
+}
+
+.category-table tr[style*="background"] {
+  background-color: #f5e8ce84 !important;
+  font-weight: 800;
+  color: #1f1f1f;
+}
+
+.category-table td:first-child {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* ===== ХЕШТЕГИ ===== */
+.hashtag {
+  font-size: 13px;
+  color: #d21111;
+  display: block;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+}

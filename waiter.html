@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Деталі офіціанта</title>
+  <link rel="stylesheet" href="waiter.css">
+</head>
+<body>
+  <div class="container">
+    <a href="index.html">← Назад до рейтингу</a>
+    <h1 id="waiterName"></h1>
+    <table id="detailsTable">
+      <thead>
+        <tr><th>Категорія</th><th>Кількість</th><th>Бали</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="totalPoints" class="total"></div>
+  </div>
+
+  <script>
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC-d0h8f7AyLtfngVfwKNDF-HuT2k6Ev5Dec7l_egJMVipEJRN7yThni-yAotlfRnK1MYeXNjU3g07/pub?output=csv';
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name');
+    document.getElementById('waiterName').textContent = `Детальний перегляд: ${name}`;
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const header = lines[0].split(',').map(h => h.trim()); // <— Обрізає ключі
+  const rows = lines.slice(2);
+  const data = {};
+
+  rows.forEach(row => {
+    const values = row.split(',');
+    const waiterName = values[0].trim();
+    const obj = {};
+    header.slice(1).forEach((key, i) => {
+      obj[key] = values[i + 1]?.trim(); // також обрізає значення
+    });
+    data[waiterName] = obj;
+  });
+
+  return data;
+}
+
+
+function renderDetails(info) {
+  const tbody = document.querySelector('#detailsTable tbody');
+  let total = 0;
+
+  const safe = key => Number(info[key]) || 0;
+  const isTrue = key => String(info[key] ?? '').trim().toUpperCase() === 'TRUE';
+
+  const positive = [
+    { key: 'signatureChicken', label: 'Фірмова курка', coef: 2 },
+    { key: 'newDishes', label: 'Новинки меню', coef: 3 },
+    { key: 'gomin', label: 'Гомін 0.2', coef: 1 },
+    { key: 'googleReviews', label: 'Відгуки в Google', coef: 5 },
+    { key: 'mediaDays', label: 'Зйомки для соцмереж (днів)', coef: 20 },
+    { key: 'substitution', label: 'Підміни / форс-мажори', coef: 10 },
+    { key: 'proposal', label: 'Реалізовані ідеї', coef: 50 }
+  ];
+
+  const logicBonuses = [
+    { key: 'highestAverage', label: 'Найвищий середній чек', value: 15 },
+    { key: 'highestTips', label: 'Найбільші чайові', value: 25 }
+  ];
+
+  const logicNegatives = [
+    { key: 'lowestAverage', label: 'Найнижчий середній чек', value: -10 },
+    { key: 'lowestGomin', label: 'Найменше Гоміну', value: -10 },
+    { key: 'lowestNew', label: 'Найменше новинок', value: -10 }
+  ];
+
+  const quantitativeNegatives = [
+    { key: 'late', label: 'Запізнення без попередження', coef: -10 },
+    { key: 'negativeReview', label: 'Негативний відгук', coef: -40 },
+    { key: 'badShift', label: 'Погана зміна', coef: -15 },
+    { key: 'ignoringGuests', label: 'Ігнор гостей', coef: -15 },
+    { key: 'noPhone', label: 'Не спитали телефон', coef: -20 },
+    { key: 'noClubMention', label: 'Не сказали про клуб', coef: -30 },
+    { key: 'badDish', label: 'Погано видана страва', coef: -10 }
+  ];
+
+  // Позитивні
+  positive.forEach(({ key, label, coef }) => {
+    const value = safe(key);
+    const points = value * coef;
+    total += points;
+    tbody.insertAdjacentHTML('beforeend', `<tr><td>${label}</td><td>${value}</td><td>${points}</td></tr>`);
+  });
+
+  // Бонуси (логічні TRUE)
+  logicBonuses.forEach(({ key, label, value }) => {
+    const active = isTrue(key);
+    const symbol = active ? '✓' : '–';
+    const points = active ? value : 0;
+    total += points;
+    console.log(`BONUS: ${label} (${key}) →`, info[key], '→', symbol, '→', points);
+    tbody.insertAdjacentHTML('beforeend', `<tr><td>${label}</td><td>${symbol}</td><td>${points}</td></tr>`);
+  });
+
+  // Штрафи (логічні TRUE)
+  logicNegatives.forEach(({ key, label, value }) => {
+    const active = isTrue(key);
+    const symbol = active ? '✓' : '–';
+    const points = active ? value : 0;
+    total += points;
+    console.log(`PENALTY (LOGIC): ${label} (${key}) →`, info[key], '→', symbol, '→', points);
+    tbody.insertAdjacentHTML('beforeend', `<tr class="negative"><td>${label}</td><td>${symbol}</td><td>${points}</td></tr>`);
+  });
+
+  // Штрафи (кількісні)
+  quantitativeNegatives.forEach(({ key, label, coef }) => {
+    const value = safe(key);
+    const points = value * coef;
+    total += points;
+    console.log(`PENALTY (NUMBER): ${label} (${key}) →`, value, '×', coef, '=', points);
+    tbody.insertAdjacentHTML('beforeend', `<tr class="negative"><td>${label}</td><td>${value}</td><td>${points}</td></tr>`);
+  });
+
+  document.getElementById('totalPoints').textContent = `Загальна сума балів: ${total}`;
+}
+
+    fetch(SHEET_URL)
+      .then(res => res.text())
+      .then(csv => {
+        const data = parseCSV(csv);
+        const cleanName = name.trim();
+        if (data[cleanName]) {
+          renderDetails(data[cleanName]);
+        } else {
+          document.getElementById('waiterName').textContent = 'Офіціанта не знайдено';
+        }
+      });
+  </script>
+</body>
+</html>
