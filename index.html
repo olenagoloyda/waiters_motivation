@@ -10,8 +10,7 @@
   <div class="container">
     <h1>Горобець рахує</h1>
     <p class="subtitle">Рейтинг з 01.05 по 31.07</p>
-     <p id="updatedAt" class="updated-text"></p>
-
+    <p id="updatedAt" class="updated-text"></p>
 
     <table id="ratingTable">
       <thead>
@@ -27,166 +26,164 @@
   </div>
 
   <script>
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC-d0h8f7AyLtfngVfwKNDF-HuT2k6Ev5Dec7l_egJMVipEJRN7yThni-yAotlfRnK1MYeXNjU3g07/pub?output=csv';
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQC-d0h8f7AyLtfngVfwKNDF-HuT2k6Ev5Dec7l_egJMVipEJRN7yThni-yAotlfRnK1MYeXNjU3g07/pub?output=csv';
 
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const header = lines[0].split(',').map(h => h.trim());
-  const rows = lines.slice(2);
-  const data = {};
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const header = lines[0].split(',').map(h => h.trim());
+      const rows = lines.slice(2);
+      const data = {};
 
-  rows.forEach(row => {
-    const values = row.split(',');
-    const name = values[0].trim();
-    const obj = {};
-    header.slice(1).forEach((key, i) => {
-      obj[key] = values[i + 1]?.trim();
-    });
-    data[name] = obj;
-  });
+      rows.forEach(row => {
+        const values = row.split(',');
+        const name = values[0].trim();
+        const obj = {};
+        header.slice(1).forEach((key, i) => {
+          obj[key] = values[i + 1]?.trim();
+        });
+        data[name] = obj;
+      });
 
-  return data;
-}
-
-function calculatePoints(info) {
-  const safe = key => Number(info[key]) || 0;
-  const isTrue = key => String(info[key] ?? '').trim().toUpperCase() === 'TRUE';
-  let total = 0;
-
-  total += safe('signatureChicken') * 2;
-  total += safe('newDishes') * 3;
-  total += safe('gomin');
-  total += safe('googleReviews') * 5;
-  total += safe('mediaDays') * 20;
-  total += safe('substitution') * 10;
-  total += safe('proposal') * 50;
-
-  if (isTrue('highestAverage')) total += 15;
-  if (isTrue('highestTips')) total += 25;
-
-  if (isTrue('lowestAverage')) total -= 10;
-  if (isTrue('lowestGomin')) total -= 10;
-  if (isTrue('lowestNew')) total -= 10;
-
-  total += safe('late') * -10;
-  total += safe('negativeReview') * -40;
-  total += safe('badShift') * -15;
-  total += safe('ignoringGuests') * -15;
-  total += safe('noPhone') * -20;
-  total += safe('noClubMention') * -30;
-  total += safe('badDish') * -10;
-
-  return total;
-}
-
-function renderCategory(data, key, label, coef) {
-  const category = [];
-
-  for (const name in data) {
-    const raw = data[name][key] ?? '0';
-    const count = Number(raw) || 0;
-    const points = count * coef;
-    category.push({ name, count, points });
-  }
-
-  category.sort((a, b) => b.points - a.points);
-
-  const table = document.createElement('table');
-  table.classList.add('category-table');
-  const thead = `<thead><tr><th>${label}</th><th>Кількість</th><th>Бали</th></tr></thead>`;
-  let tbody = '<tbody>';
-
-  const hashtags = {
-  signatureChicken: '#куркорекорд',
-  newDishes: '#менюмейкер',
-  gomin: '#гомінголосно',
-  googleReviews: '#відгукозбірник',
-  mediaDays: '#екрангерой',
-  substitution: '#рятівникдня',
-  proposal: '#ідеявроботу'
-};
-
-  category.forEach((row, i) => {
-    const crown = i === 0 ? '🔥 ' : '';
-    const highlight = i === 0 ? ' style="font-weight: bold; background:#fff7d6;"' : '';
-    const tag = (i === 0 && hashtags[key]) ? `<br><span class="hashtag">${hashtags[key]}</span>` : '';
-tbody += `<tr${highlight}><td>${crown}${row.name}${tag}</td><td>${row.count}</td><td>${row.points}</td></tr>`;
-
-  });
-
-  tbody += '</tbody>';
-  table.innerHTML = thead + tbody;
-
-  const block = document.createElement('div');
-  block.classList.add('category-block');
-  const title = document.createElement('h2');
-  title.textContent = label;
-  block.appendChild(title);
-  block.appendChild(table);
-
-  document.getElementById('categories').appendChild(block);
-}
-
-fetch(SHEET_URL)
-  .then(res => res.text())
-  .then(csv => {
-    const data = parseCSV(csv);
-    // знайти найпізнішу дату з updatedAt
-let latestDate = null;
-
-for (const name in data) {
-  const rawDate = data[name].updatedAt;
-  if (!rawDate) continue;
-
-  const parsed = new Date(rawDate.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$2/$1/$3')); // підтримка формату дд.мм.рррр
-
-  if (!latestDate || parsed > latestDate) {
-    latestDate = parsed;
-  }
-}
-
-if (latestDate) {
-  const formatted = latestDate.toLocaleDateString('uk-UA', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-  document.getElementById('updatedAt').textContent = `Оновлено ${formatted}`;
-}
-
-    const tbody = document.getElementById('ratingBody');
-    
-
-    for (const name in data) {
-      const tr = document.createElement('tr');
-      const tdName = document.createElement('td');
-      const tdPoints = document.createElement('td');
-
-      const link = document.createElement('a');
-      link.href = `waiter.html?name=${encodeURIComponent(name)}`;
-      link.textContent = name;
-
-      tdName.appendChild(link);
-      tdPoints.textContent = calculatePoints(data[name]);
-
-      tr.appendChild(tdName);
-      tr.appendChild(tdPoints);
-      tbody.appendChild(tr);
+      return data;
     }
 
-    // Категорійні рейтинги
-    renderCategory(data, 'signatureChicken', 'Фірмова курка (×2)', 2);
-    renderCategory(data, 'newDishes', 'Новинки меню (×3)', 3);
-    renderCategory(data, 'gomin', 'Гомін 0.2 (×1)', 1);
-    renderCategory(data, 'googleReviews', 'Відгуки в Google (×5)', 5);
-    renderCategory(data, 'mediaDays', 'Зйомки для соцмереж (×20)', 20);
-    renderCategory(data, 'substitution', 'Підміни / форс-мажори (×10)', 10);
-    renderCategory(data, 'proposal', 'Реалізовані ідеї (×50)', 50);
-  });
-</script>
+    function calculateMonthlyPoints(info) {
+      const safe = key => Number(info[key]) || 0;
+      const isTrue = key => String(info[key] ?? '').trim().toUpperCase() === 'TRUE';
+      let total = 0;
 
+      total += safe('signatureChicken') * 2;
+      total += safe('newDishes') * 3;
+      total += safe('gomin');
+      total += safe('googleReviews') * 5;
+      total += safe('mediaDays') * 20;
+      total += safe('substitution') * 10;
+      total += safe('proposal') * 50;
+
+      if (isTrue('highestAverage')) total += 15;
+      if (isTrue('highestTips')) total += 25;
+
+      if (isTrue('lowestAverage')) total -= 10;
+      if (isTrue('lowestGomin')) total -= 10;
+      if (isTrue('lowestNew')) total -= 10;
+
+      total += safe('late') * -10;
+      total += safe('negativeReview') * -40;
+      total += safe('badShift') * -15;
+      total += safe('ignoringGuests') * -15;
+      total += safe('noPhone') * -20;
+      total += safe('noClubMention') * -30;
+      total += safe('badDish') * -10;
+
+      return total;
+    }
+
+    function renderCategory(data, key, label, coef) {
+      const category = [];
+
+      for (const name in data) {
+        const raw = data[name][key] ?? '0';
+        const count = Number(raw) || 0;
+        const points = count * coef;
+        category.push({ name, count, points });
+      }
+
+      category.sort((a, b) => b.points - a.points);
+
+      const table = document.createElement('table');
+      table.classList.add('category-table');
+      const thead = `<thead><tr><th>${label}</th><th>Кількість</th><th>Бали</th></tr></thead>`;
+      let tbody = '<tbody>';
+
+      const hashtags = {
+        signatureChicken: '#куркорекорд',
+        newDishes: '#менюмейкер',
+        gomin: '#гомінголосно',
+        googleReviews: '#відгукозбірник',
+        mediaDays: '#екрангерой',
+        substitution: '#рятівникдня',
+        proposal: '#ідеявроботу'
+      };
+
+      category.forEach((row, i) => {
+        const crown = i === 0 ? '🔥 ' : '';
+        const highlight = i === 0 ? ' style="font-weight: bold; background:#fff7d6;"' : '';
+        const tag = (i === 0 && hashtags[key]) ? `<br><span class="hashtag">${hashtags[key]}</span>` : '';
+        tbody += `<tr${highlight}><td>${crown}${row.name}${tag}</td><td>${row.count}</td><td>${row.points}</td></tr>`;
+      });
+
+      tbody += '</tbody>';
+      table.innerHTML = thead + tbody;
+
+      const block = document.createElement('div');
+      block.classList.add('category-block');
+      const title = document.createElement('h2');
+      title.textContent = label;
+      block.appendChild(title);
+      block.appendChild(table);
+
+      document.getElementById('categories').appendChild(block);
+    }
+
+    fetch(SHEET_URL)
+      .then(res => res.text())
+      .then(csv => {
+        const data = parseCSV(csv);
+
+        // Оновлення дати
+        let latestDate = null;
+        for (const name in data) {
+          const rawDate = data[name].updatedAt;
+          if (!rawDate) continue;
+          const parsed = new Date(rawDate.replace(/(\d{2})\.(\d{2})\.(\d{4})/, '$2/$1/$3'));
+          if (!latestDate || parsed > latestDate) latestDate = parsed;
+        }
+
+        if (latestDate) {
+          const formatted = latestDate.toLocaleDateString('uk-UA', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+          });
+          document.getElementById('updatedAt').textContent = `Оновлено ${formatted}`;
+        }
+
+        const tbody = document.getElementById('ratingBody');
+
+        for (const name in data) {
+          const monthly = calculateMonthlyPoints(data[name]);
+          const previous = +data[name].previousPoints || 0;
+          const total = monthly + previous;
+
+          const tr = document.createElement('tr');
+          const tdName = document.createElement('td');
+          const tdPoints = document.createElement('td');
+
+          const link = document.createElement('a');
+          link.href = `waiter.html?name=${encodeURIComponent(name)}`;
+          link.textContent = name;
+
+          tdName.appendChild(link);
+          tdPoints.innerHTML = `
+  <strong>${total}</strong><br>
+  <span style="font-size: 13px; color: #888;">
+    (з них ${monthly} — цього місяця)
+  </span>
+`;
+
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdPoints);
+          tbody.appendChild(tr);
+        }
+
+        // Категорії
+        renderCategory(data, 'signatureChicken', 'Фірмова курка (×2)', 2);
+        renderCategory(data, 'newDishes', 'Новинки меню (×3)', 3);
+        renderCategory(data, 'gomin', 'Гомін 0.2 (×1)', 1);
+        renderCategory(data, 'googleReviews', 'Відгуки в Google (×5)', 5);
+        renderCategory(data, 'mediaDays', 'Зйомки для соцмереж (×20)', 20);
+        renderCategory(data, 'substitution', 'Підміни / форс-мажори (×10)', 10);
+        renderCategory(data, 'proposal', 'Реалізовані ідеї (×50)', 50);
+      });
   </script>
-  <div id="categories"></div>
-  <script src="script.js"></script>
 </body>
 </html>
