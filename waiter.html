@@ -57,14 +57,14 @@ function renderDetails(info) {
     { key: 'newDishes', label: 'Новинки меню', coef: 3 },
     { key: 'gomin', label: 'Гомін 0.2', coef: 1 },
     { key: 'googleReviews', label: 'Відгуки в Google', coef: 5 },
-    { key: 'mediaDays', label: 'Зйомки для соцмереж (днів)', coef: 20 },
+    { key: 'mediaDays', label: 'Зйомки для соцмереж (днів)', coef: 250 },
     { key: 'substitution', label: 'Підміни / форс-мажори', coef: 10 },
     { key: 'proposal', label: 'Реалізовані ідеї', coef: 50 }
   ];
 
   const logicBonuses = [
     { key: 'highestAverage', label: 'Найвищий середній чек', value: 15 },
-    { key: 'highestTips', label: 'Найбільші чайові', value: 25 }
+    { key: 'highestTips', label: 'Найбільші чайові', value:300 }
   ];
 
   const logicNegatives = [
@@ -75,7 +75,7 @@ function renderDetails(info) {
 
   const quantitativeNegatives = [
     { key: 'late', label: 'Запізнення без попередження', coef: -10 },
-    { key: 'negativeReview', label: 'Негативний відгук', coef: -40 },
+    { key: 'negativeReview', label: 'Негативний відгук', coef: -100 },
     { key: 'badShift', label: 'Погана зміна', coef: -15 },
     { key: 'ignoringGuests', label: 'Ігнор гостей', coef: -15 },
     { key: 'noPhone', label: 'Не спитали телефон', coef: -20 },
