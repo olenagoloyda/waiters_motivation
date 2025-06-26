@@ -56,21 +56,21 @@
       total += safe('newDishes') * 3;
       total += safe('gomin');
       total += safe('googleReviews') * 5;
-      total += safe('mediaDays') * 20;
+      total += safe('mediaDays') * 250;
       total += safe('substitution') * 10;
       total += safe('proposal') * 50;
 
       if (isTrue('highestAverage')) total += 15;
-      if (isTrue('highestTips')) total += 25;
+      if (isTrue('highestTips')) total += 300;
 
       if (isTrue('lowestAverage')) total -= 10;
       if (isTrue('lowestGomin')) total -= 10;
       if (isTrue('lowestNew')) total -= 10;
 
       total += safe('late') * -10;
-      total += safe('negativeReview') * -40;
+      total += safe('negativeReview') * -100;
       total += safe('badShift') * -15;
-      total += safe('ignoringGuests') * -15;
+      total += safe('ignoringGuests') * -50;
       total += safe('noPhone') * -20;
       total += safe('noClubMention') * -30;
       total += safe('badDish') * -10;
